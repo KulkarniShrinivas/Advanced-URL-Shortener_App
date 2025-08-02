@@ -10,7 +10,38 @@ const Click = require('../models/Click');
 const moment = require('moment');
 
 
+/**
+ * @swagger
+ * tags:
+ * name: Analytics
+ * description: Get insights and data for your links.
+ */
 
+/**
+ * @swagger
+ * /analytics/{alias}:
+ * get:
+ * summary: Get analytics for a single URL
+ * tags: [Analytics]
+ * description: This gives you a detailed performance report for one specific short link, showing you who clicked, when, and on what device.
+ * security:
+ * - GoogleOAuth: ['profile']
+ * parameters:
+ * - in: path
+ * name: alias
+ * required: true
+ * schema:
+ * type: string
+ * description: The short code for the URL you want to analyze.
+ * example: "aBcDeF"
+ * responses:
+ * 200:
+ * description: A full analytics report for the URL.
+ * 401:
+ * description: You must be logged in to view your analytics.
+ * 404:
+ * description: This URL was not found or doesn't belong to you.
+ */
 router.get('/:alias', protect, cacheMiddleware, getUrlAnalytics);
 exports.getUrlsAnalytics = async (requestAnimationFrame, res) => {
     const {alias} = req.params;
@@ -82,6 +113,31 @@ exports.getUrlsAnalytics = async (requestAnimationFrame, res) => {
 };
 
 
+
+/**
+ * @swagger
+ * /analytics/topic/{topic}:
+ * get:
+ * summary: Get analytics by topic
+ * tags: [Analytics]
+ * description: Get an aggregated report for all the links you have categorized under a specific topic, like "marketing" or "sales."
+ * security:
+ * - GoogleOAuth: ['profile']
+ * parameters:
+ * - in: path
+ * name: topic
+* required: true
+* schema:
+* type: string
+* description: The topic you want to get a report for.
+* example: "acquisition"
+* responses:
+* 200:
+* description: Aggregated analytics for the specified topic.
+* 401:
+* description: You must be logged in to view your analytics.
+*/
+
 router.get('/topic/:topic', protect, cacheMiddleware, getTopicAnalytics);
 exports.getTopicAnalytics = async (req, res) =>{
     const{topic} = req.params;
@@ -114,6 +170,23 @@ exports.getTopicAnalytics = async (req, res) =>{
     }
 };
 
+
+
+/**
+ * @swagger
+ * /analytics/overall:
+ * get:
+ * summary: Get your total analytics
+ * tags: [Analytics]
+ * description: This endpoint provides a high-level overview of the performance of all your shortened URLs combined. It's a great way to see your total clicks at a glance.
+ * security:
+ * - GoogleOAuth: ['profile']
+ * responses:
+ * 200:
+ * description: Your full overall analytics report.
+ * 401:
+ * description: You must be logged in to view your analytics.
+ */
 
 router.get('/overall', protect, cacheMiddleware, getOverallAnalytics);
 exports.getOverAllAnalytics = async (req, res) =>{
