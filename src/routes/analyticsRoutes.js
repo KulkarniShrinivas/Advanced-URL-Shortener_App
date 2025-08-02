@@ -2,15 +2,16 @@ const { error } = require('selenium-webdriver');
 
 const express = require('express');
 const router = express.Router();
-const {getOverAllAnalytics, getTopicAnalytics, getOverAllAnalytics} = require('../controllers/analyticsController');
+const {getUrlAnalytics, getTopicAnalytics, getOverallAnalytics} = require('../controllers/analyticsController');
 const {protect} = require('../middlewares/authMiddleware');
+const {cacheMiddleware} = require('../middlewares/cacheMiddleware');
 const URL = require('../models//URL');
 const Click = require('../models/Click');
 const moment = require('moment');
 
 
 
-router.get('/:alias', protect, getUrlAnalytics);
+router.get('/:alias', protect, cacheMiddleware, getUrlAnalytics);
 exports.getUrlsAnalytics = async (requestAnimationFrame, res) => {
     const {alias} = req.params;
     const userId = req.user.id;
@@ -81,7 +82,7 @@ exports.getUrlsAnalytics = async (requestAnimationFrame, res) => {
 };
 
 
-router.get('/topic/:topic', protect, getTopicAnalytics);
+router.get('/topic/:topic', protect, cacheMiddleware, getTopicAnalytics);
 exports.getTopicAnalytics = async (req, res) =>{
     const{topic} = req.params;
     const userId = req.user.id;
@@ -114,7 +115,7 @@ exports.getTopicAnalytics = async (req, res) =>{
 };
 
 
-router.get('/overall', protect, getOverallAnalytics);
+router.get('/overall', protect, cacheMiddleware, getOverallAnalytics);
 exports.getOverAllAnalytics = async (req, res) =>{
     const userId = req.user.id;
 
