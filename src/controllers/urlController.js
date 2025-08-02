@@ -55,22 +55,30 @@ exports.createShortURL = async (req, res) => {
 
 
 exports.redirectToLongUrl = async (req, res) =>{
-    const { alias } = req.params;
+    
+    const {alias} = req.params;
 
     try{
-        const url = await URL.findOne({alias});
+        const cachedurl = await redisClient.get(alias);
+        if(cachedurl){
+            logClick(req, { _id: cachedUrl.urlId, longUrl: cachedUrl.longUrl });
+            return res.redirect(cachedUrl.longUrl);
+        }
 
+        const url = await URL.findOne({alias});
         if(url){
-            logClick(req, res);
+            await redisClient.set(alias, JSON.stringify({ longUrl: url.longUrl, urlId: url._id }), 'EX', 86400);
+            longClick(req, url);
             return res.redirect(url.longUrl);
-        } else {
-            return res.status(400).send('URL not found');
+        } else{
+            return res.status(404).json({ message: 'URL not found' });
         }
     } catch(err){
         console.error(err);
-        return res.status(500).json({error: 'Server error' });
+        return res.status(500).json({error: 'Server error'});
     }
 };
+
 
 const logClick = async(req, url) => {
     try{
