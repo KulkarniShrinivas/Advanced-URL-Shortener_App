@@ -8,7 +8,6 @@ const authRoutes = require('./src/routes/authRoutes');
 dotenv.config();
 connectDB();
 
-// Passport config
 require('./src/config/passport')(passport);
 
 const app = express();
@@ -16,20 +15,18 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Session middleware (MUST come before passport middleware)
 app.use(
   session({
-    secret: 'your_secret_key', // You can add this to your .env file
+    secret: process.env.SESSION_SECRET, 
     resave: false,
     saveUninitialized: false,
   })
 );
 
-// Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
+
 app.use('/api/auth', authRoutes);
 app.use('/api', urlRoutes);
 
@@ -41,3 +38,43 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Advanced URL Shortener API',
+      version: '1.0.0',
+      description: 'A scalable URL shortener with advanced analytics.',
+    },
+    servers: [
+      {
+        url: 'http://localhost:5000/api',
+        description: 'Local development server',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        GoogleOAuth: {
+          type: 'oauth2',
+          flows: {
+            implicit: {
+              authorizationUrl: 'http://localhost:5000/api/auth/google',
+              scopes: {
+                profile: 'Grants access to a user\'s basic profile information.',
+              },
+            },
+          },
+        },
+      },
+    },
+    security: [{
+      GoogleOAuth: ['profile'],
+    }],
+  },
+  apis: ['./src/routes/*.js'], 
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
