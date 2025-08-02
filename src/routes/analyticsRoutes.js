@@ -4,10 +4,11 @@ const { getUrlAnalytics, getTopicAnalytics, getOverallAnalytics } = require('../
 const { protect } = require('../middlewares/authMiddleware');
 const { cacheMiddleware } = require('../middlewares/cacheMiddleware');
 
-router.get('/:alias', protect, cacheMiddleware, getUrlAnalytics);
-
-router.get('/topic/:topic', protect, cacheMiddleware, getTopicAnalytics);
 
 router.get('/overall', protect, cacheMiddleware, getOverallAnalytics);
+router.get('/topic/:topic', protect, cacheMiddleware, getTopicAnalytics);
+
+
+router.get('/:alias', protect, cacheMiddleware, getUrlAnalytics);
 
 module.exports = router;
