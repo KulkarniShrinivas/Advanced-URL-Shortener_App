@@ -1,3 +1,4 @@
+const redisClient = require('../config/redis');
 const URL = require('../models/URL');
 const Click = require('../models/Click');
 const moment = require('moment');
@@ -66,6 +67,9 @@ exports.getUrlAnalytics = async(req, res) =>{
         osType,
         deviceType
     };
+
+    await redisClient.set(req.originalUrl, JSON.stringify(analytics), 'EX', 600);
+    res.status(200).json(analytics);
 
     res.status(200).json(analytics);
     } catch(err){
