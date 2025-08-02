@@ -4,6 +4,7 @@ const userAgentParser = require('../utils/userAgentParser');
 const geoLocator = require('../utils/geoLocator');
 const URL = require('../models/URL');
 const generateAlias = require('../utils/aliasGenerator');
+const redisClient = require('../config/redis');
 
 exports.createShortURL = async (req, res) => {
     const { longUrl, customAlias, topic } = req.body;
