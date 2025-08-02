@@ -38,11 +38,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api', urlRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
-// Mount the public-facing redirect route at the root level
+
 app.use('/', redirectRoutes);
 
 app.get('/', (req, res) => {
-  res.send('URL Shortener API is running...');
+  res.send('Logged out successfully');
 });
 
 const PORT = process.env.PORT || 5000;

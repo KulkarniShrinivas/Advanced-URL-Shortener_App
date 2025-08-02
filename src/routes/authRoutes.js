@@ -13,11 +13,19 @@ router.get(
 );
 
 router.get('/logout', (req, res, next) => {
-  req.logout((err) => {
+ 
+  req.session.destroy((err) => {
     if (err) {
+      console.error('Error destroying session:', err);
       return next(err);
     }
-    res.redirect('/');
+    
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      }
+      res.redirect('/');
+    });
   });
 });
 
