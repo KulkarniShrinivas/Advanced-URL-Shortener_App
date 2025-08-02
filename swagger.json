@@ -1,0 +1,287 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Advanced URL Shortener API",
+    "version": "1.0.0",
+    "description": "A scalable URL shortener with advanced analytics."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Everything to do with logging in and out using Google."
+    },
+    {
+      "name": "URLs",
+      "description": "Create and manage your shortened links."
+    },
+    {
+      "name": "Analytics",
+      "description": "Get insights and data for your links."
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "GoogleOAuth": {
+        "type": "oauth2",
+        "flows": {
+          "implicit": {
+            "authorizationUrl": "http://localhost:5000/api/auth/google",
+            "scopes": {
+              "profile": "Grants access to a user's basic profile information."
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/google": {
+      "get": {
+        "summary": "Log in with Google",
+        "tags": [
+          "Authentication"
+        ],
+        "description": "This endpoint starts the Google Sign-In process. Just hit this URL, and you'll be redirected to Google to authorize your account.",
+        "responses": {
+          "302": {
+            "description": "Redirect to Google for authentication."
+          }
+        }
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "summary": "Google OAuth callback",
+        "tags": [
+          "Authentication"
+        ],
+        "description": "This is a private endpoint that handles the response from Google after a successful login. It will create a user in our database if one doesn't exist and log you in.",
+        "responses": {
+          "302": {
+            "description": "Successfully logged in. You will be redirected to the dashboard."
+          },
+          "401": {
+            "description": "Authentication failed for some reason."
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "get": {
+        "summary": "Log out",
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Use this to end your current session. It will clear your login status.",
+        "responses": {
+          "302": {
+            "description": "Successfully logged out. You will be redirected to the homepage."
+          }
+        }
+      }
+    },
+    "/shorten": {
+      "post": {
+        "summary": "Create a new short URL",
+        "tags": [
+          "URLs"
+        ],
+        "description": "This is the main endpoint to shorten a long URL. You can optionally provide your own custom alias or categorize the link with a topic for better tracking.",
+        "security": [
+          {
+            "GoogleOAuth": [
+              "profile"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "longUrl": {
+                    "type": "string",
+                    "description": "The original URL you want to shorten."
+                  },
+                  "customAlias": {
+                    "type": "string",
+                    "description": "(Optional) Your preferred short link name. It must be unique!"
+                  },
+                  "topic": {
+                    "type": "string",
+                    "description": "(Optional) A topic to help group your links. Great for segmenting analytics later."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The short URL was created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shortUrl": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The longUrl field is missing from your request."
+          },
+          "401": {
+            "description": "You need to be logged in to create a URL."
+          },
+          "409": {
+            "description": "The custom alias you chose is already in use."
+          },
+          "429": {
+            "description": "You've created too many URLs recently. Please try again later."
+          }
+        }
+      }
+    },
+    "/{alias}": {
+      "get": {
+        "summary": "Redirect to the original URL",
+        "tags": [
+          "URLs"
+        ],
+        "description": "When a user clicks on one of your short links, this endpoint will redirect them to the original URL and automatically log their visit for analytics.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "alias",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique short code for the URL."
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to the original long URL."
+          },
+          "404": {
+            "description": "The short URL could not be found."
+          }
+        }
+      }
+    },
+    "/analytics/{alias}": {
+      "get": {
+        "summary": "Get analytics for a single URL",
+        "tags": [
+          "Analytics"
+        ],
+        "description": "This gives you a detailed performance report for one specific short link, showing you who clicked, when, and on what device.",
+        "security": [
+          {
+            "GoogleOAuth": [
+              "profile"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "alias",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The short code for the URL you want to analyze."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A full analytics report for the URL."
+          },
+          "401": {
+            "description": "You must be logged in to view your analytics."
+          },
+          "404": {
+            "description": "This URL was not found or doesn't belong to you."
+          }
+        }
+      }
+    },
+    "/analytics/topic/{topic}": {
+      "get": {
+        "summary": "Get analytics by topic",
+        "tags": [
+          "Analytics"
+        ],
+        "description": "Get an aggregated report for all the links you have categorized under a specific topic, like \"marketing\" or \"sales.\"",
+        "security": [
+          {
+            "GoogleOAuth": [
+              "profile"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topic",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The topic you want to get a report for."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregated analytics for the specified topic."
+          },
+          "401": {
+            "description": "You must be logged in to view your analytics."
+          }
+        }
+      }
+    },
+    "/analytics/overall": {
+      "get": {
+        "summary": "Get your total analytics",
+        "tags": [
+          "Analytics"
+        ],
+        "description": "This endpoint provides a high-level overview of the performance of all your shortened URLs combined. It's a great way to see your total clicks at a glance.",
+        "security": [
+          {
+            "GoogleOAuth": [
+              "profile"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Your full overall analytics report."
+          },
+          "401": {
+            "description": "You must be logged in to view your analytics."
+          }
+        }
+      }
+    }
+  }
+}

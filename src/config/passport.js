@@ -9,7 +9,8 @@ module.exports = function (passport) {
                 clientSecret: process.env.GOOGLE_CLIENT_SECRET,
                 callbackURL: '/api/auth/google/callback',
             },
-            async(accessToken, refreshToken, Profiler, done) => {
+           
+            async (accessToken, refreshToken, params, profile, done) => {
                 const newUser = {
                     googleId: profile.id,
                     displayName: profile.displayName,
@@ -17,24 +18,29 @@ module.exports = function (passport) {
                     image: profile.photos[0].value,
                 };
 
-                try{
-                    let user = await User.findOne({googleId: profile.id });
-                    if(user){
+                try {
+                    let user = await User.findOne({ googleId: profile.id });
+                    if (user) {
                         done(null, user);
-                    } else{
+                    } else {
                         user = await User.create(newUser);
                         done(null, user);
                     }
-                } catch(err){
+                } catch (err) {
                     console.error(err);
                 }
             }
-            
         )
     );
 
     passport.serializeUser((user, done) => done(null, user.id));
-    passport.deserializeUser((id, done) => {
-        User.findById(id, (err, user) => done(err, user));
+
+    passport.deserializeUser(async (id, done) => {
+        try {
+            const user = await User.findById(id);
+            done(null, user);
+        } catch (err) {
+            done(err, null);
+        }
     });
 };

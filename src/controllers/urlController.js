@@ -1,4 +1,3 @@
-const { error } = require('selenium-webdriver');
 const Click = require('../models/Click');
 const userAgentParser = require('../utils/userAgentParser');
 const geoLocator = require('../utils/geoLocator');
@@ -6,7 +5,7 @@ const URL = require('../models/URL');
 const generateAlias = require('../utils/aliasGenerator');
 const redisClient = require('../config/redis');
 
-exports.createShortURL = async (req, res) => {
+exports.createShortUrl = async (req, res) => {
     const { longUrl, customAlias, topic } = req.body;
 
     if (!longUrl) {
@@ -53,40 +52,38 @@ exports.createShortURL = async (req, res) => {
     }
 };
 
+exports.redirectToLongUrl = async (req, res) => {
+    const { alias } = req.params;
 
-exports.redirectToLongUrl = async (req, res) =>{
-    
-    const {alias} = req.params;
-
-    try{
-        const cachedurl = await redisClient.get(alias);
-        if(cachedurl){
-            logClick(req, { _id: cachedUrl.urlId, longUrl: cachedUrl.longUrl });
-            return res.redirect(cachedUrl.longUrl);
+    try {
+        const cachedUrl = await redisClient.get(alias);
+        if (cachedUrl) {
+            const parsedUrl = JSON.parse(cachedUrl);
+            logClick(req, { _id: parsedUrl.urlId, longUrl: parsedUrl.longUrl });
+            return res.redirect(parsedUrl.longUrl);
         }
 
-        const url = await URL.findOne({alias});
-        if(url){
+        const url = await URL.findOne({ alias });
+        if (url) {
             await redisClient.set(alias, JSON.stringify({ longUrl: url.longUrl, urlId: url._id }), 'EX', 86400);
-            longClick(req, url);
+            logClick(req, url);
             return res.redirect(url.longUrl);
-        } else{
+        } else {
             return res.status(404).json({ message: 'URL not found' });
         }
-    } catch(err){
+    } catch (err) {
         console.error(err);
-        return res.status(500).json({error: 'Server error'});
+        return res.status(500).json({ error: 'Server error' });
     }
 };
 
-
-const logClick = async(req, url) => {
-    try{
+const logClick = async (req, url) => {
+    try {
         const userAgent = req.headers['user-agent'];
         const ipAddress = req.ip;
 
-        const {os, device} = userAgentParser.parse(userAgent);
-        const {country, city} = geoLocator.locate(ipAddress);
+        const { os, device } = userAgentParser.parse(userAgent);
+        const { country, city } = geoLocator.locate(ipAddress);
 
         const newClick = new Click({
             url: url._id,
@@ -99,7 +96,7 @@ const logClick = async(req, url) => {
         });
 
         await newClick.save();
-    } catch(err){
+    } catch (err) {
         console.error('Error logging click', err);
     }
 };
