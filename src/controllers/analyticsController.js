@@ -74,3 +74,30 @@ exports.getUrlAnalytics = async(req, res) =>{
     } 
 };
 
+
+
+exports.getTopicAnalytics = async(req, res) =>{
+    const {topic} = req.params;
+    const userId = req.user.id;
+
+    try{
+        const urls = await URL.find({user: userId, topic});
+        const urlIds = urls.map(url => url._id);
+
+        const totalClicks = await Click.countDocuments({ url: { $in: urlIds } });
+        const uniqueClicks = (await Click.distinct('ipAddress', { url: { $in: urlIds } })).length;
+
+        const urlsWithClicks = await Promise.all(urls.map(async url => {
+        const totalClicks = await Click.countDocuments({ url: url._id });
+        const uniqueClicks = (await Click.distinct('ipAddress', { url: url._id })).length;
+        return { shortUrl: url.shortUrl, totalClicks, uniqueClicks };
+    }));
+
+    res.status(200).json({totalClicks, uniqueClicks, clickByDate, urls: urlsWithClicks });
+
+    } catch(err){
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
+};
+
