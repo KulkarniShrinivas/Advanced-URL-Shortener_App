@@ -43,9 +43,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/auth', authRoutes);
 app.use('/api', urlRoutes);
 app.use('/api/analytics', analyticsRoutes);
-app.use('/', redirectRoutes);
-app.use('/', dashboardRoutes);
 
+
+app.use('/', dashboardRoutes);
+app.use('/', redirectRoutes);
 
 app.get('/', (req, res) => {
   if (req.isAuthenticated()) {
