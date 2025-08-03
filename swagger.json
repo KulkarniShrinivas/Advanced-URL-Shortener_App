@@ -7,6 +7,10 @@
   },
   "servers": [
     {
+      "url": "https://advanced-url-shortener-app-gpx2.onrender.com/api",
+      "description": "Deployed production server"
+    },
+    {
       "url": "http://localhost:5000/api",
       "description": "Local development server"
     }
@@ -31,7 +35,7 @@
         "type": "oauth2",
         "flows": {
           "implicit": {
-            "authorizationUrl": "http://localhost:5000/api/auth/google",
+            "authorizationUrl": "https://advanced-url-shortener-app-gpx2.onrender.com/api/auth/google",
             "scopes": {
               "profile": "Grants access to a user's basic profile information."
             }
@@ -147,7 +151,7 @@
             "description": "The longUrl field is missing from your request."
           },
           "401": {
-            "description": "You need to be logged in to create a URL."
+            "description": "You must be logged in to create a URL."
           },
           "409": {
             "description": "The custom alias you chose is already in use."
