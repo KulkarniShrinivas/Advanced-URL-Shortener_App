@@ -1,7 +1,6 @@
 const redisClient = require('../config/redis');
 
 exports.cacheMiddleware = (req, res, next) => {
-
   const cacheKey = req.originalUrl;
   
   redisClient.get(cacheKey, (err, data) => {
@@ -11,10 +10,8 @@ exports.cacheMiddleware = (req, res, next) => {
     }
     
     if (data !== null) {
-     
       res.send(JSON.parse(data));
     } else {
-   ne
       next();
     }
   });
