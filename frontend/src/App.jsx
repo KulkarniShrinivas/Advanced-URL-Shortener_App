@@ -15,8 +15,8 @@ function App() {
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [analyticsError, setAnalyticsError] = useState(null);
 
- 
-  const BASE_API_URL = '';
+
+  const BASE_API_URL = 'https://advanced-url-shortener-app-gpx2.onrender.com';
 
   useEffect(() => {
     checkAuthStatus();
@@ -24,14 +24,15 @@ function App() {
 
   const checkAuthStatus = async () => {
     try {
-     
+
       const response = await axios.get(`${BASE_API_URL}/api/analytics/overall`);
       if (response.status === 200) {
-        
+      
         setUser({ displayName: 'Logged In User' });
         setLinks(response.data.urls || []); 
       }
     } catch {
+      
       setUser(null);
       setLinks([]);
     } finally {
@@ -40,7 +41,8 @@ function App() {
   };
 
   const handleLogin = () => {
-    window.location.href = window.location.origin + `${BASE_API_URL}/api/auth/google`;
+    
+    window.location.href = `${BASE_API_URL}/api/auth/google`;
   };
 
   const handleLogout = async () => {
@@ -48,7 +50,8 @@ function App() {
       await axios.get(`${BASE_API_URL}/api/auth/logout`);
       setUser(null);
       setLinks([]);
-      window.location.href = window.location.origin + `${BASE_API_URL}/`;
+   
+      window.location.href = `${BASE_API_URL}/`;
     } catch (error) {
       console.error('Logout failed:', error);
       alert('Logout failed. Please try again.'); 
@@ -78,7 +81,6 @@ function App() {
     setAnalyticsError(null);
   };
 
-  // Render loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -89,7 +91,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 font-sans antialiased text-gray-900">
-      
+  
       <Header user={user} onLogin={handleLogin} onLogout={handleLogout} />
       {user ? (
         <Dashboard

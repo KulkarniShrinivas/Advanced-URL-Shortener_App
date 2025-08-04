@@ -5,6 +5,7 @@ const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
+const cors = require('cors'); 
 
 const connectDB = require('./src/config/db');
 const authRoutes = require('./src/routes/authRoutes');
@@ -16,17 +17,22 @@ const dashboardRoutes = require('./src/routes/dashboardRoutes');
 dotenv.config();
 connectDB();
 
-require('./src/config/passport')(passport);
+const app = express(); 
 
-const app = express();
 app.set('trust proxy', true);
+
+
+app.use(cors({
+    origin: 'https://your-netlify-app-name.netlify.app', 
+    credentials: true 
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET, 
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
@@ -35,6 +41,7 @@ app.use(
   })
 );
 
+require('./src/config/passport')(passport); 
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -43,7 +50,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/auth', authRoutes);
 app.use('/api', urlRoutes);
 app.use('/api/analytics', analyticsRoutes);
-
 
 app.use('/', dashboardRoutes);
 app.use('/', redirectRoutes);
