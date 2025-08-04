@@ -31,7 +31,7 @@ function App() {
         setUser({ displayName: 'Logged In User' });
         setLinks(response.data.urls || []); 
       }
-    } catch (error) {
+    } catch {
       setUser(null);
       setLinks([]);
     } finally {
