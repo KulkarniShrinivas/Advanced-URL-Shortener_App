@@ -53,21 +53,12 @@ app.use('/api/analytics', analyticsRoutes);
 
 app.use('/', redirectRoutes); 
 
-
 app.get('/', (req, res) => {
   if (req.isAuthenticated()) {
-   
-    res.redirect('https://resplendent-gaufre-2d072a.netlify.app/dashboard'); 
+
+    res.redirect('https://resplendent-gaufre-2d072a.netlify.app/dashboard');
   } else {
     
     res.redirect('/api/auth/google');
   }
-});
-
-
-
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
 });
