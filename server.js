@@ -23,7 +23,7 @@ app.set('trust proxy', true);
 
 
 app.use(cors({
-    origin: 'https://your-netlify-app-name.netlify.app', 
+    origin: 'resplendent-gaufre-2d072a.netlify.app', 
     credentials: true 
 }));
 
