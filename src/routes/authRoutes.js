@@ -4,21 +4,24 @@ const router = express.Router();
 
 const ensureAuth = (req, res, next) => {
     if (req.isAuthenticated()) {
-        return res.redirect('/dashboard'); 
+        return res.redirect('/dashboard');
     }
     next();
 };
 
+
 router.get('/google', ensureAuth, passport.authenticate('google', { scope: ['profile'] }));
+
 
 router.get(
     '/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
-        
-        res.redirect('/dashboard');
+   
+        res.redirect('http://localhost:5173/dashboard');
     }
 );
+
 
 router.get('/logout', (req, res, next) => {
     req.logout((logoutErr) => {
