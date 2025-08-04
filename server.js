@@ -12,7 +12,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const urlRoutes = require('./src/routes/urlRoutes');
 const redirectRoutes = require('./src/routes/redirectRoutes');
 const analyticsRoutes = require('./src/routes/analyticsRoutes');
-const dashboardRoutes = require('./src/routes/dashboardRoutes'); 
+const dashboardRoutes = require('./src/routes/dashboardRoutes');
 
 dotenv.config();
 connectDB();
@@ -22,7 +22,7 @@ const app = express();
 app.set('trust proxy', true);
 
 app.use(cors({
-    origin: 'https://resplendent-gaufre-2d072a.netlify.app', 
+    origin: '*',
     credentials: true
 }));
 
@@ -50,14 +50,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api', urlRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
-
 app.use('/', dashboardRoutes);
 app.use('/', redirectRoutes);
 
-
 app.get('/', (req, res) => {
   if (req.isAuthenticated()) {
-    res.redirect('/dashboard'); 
+    res.redirect('/dashboard');
   } else {
     res.redirect('/api/auth/google');
   }
