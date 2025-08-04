@@ -78,7 +78,6 @@ function App() {
     setAnalyticsError(null);
   };
 
-  // Render loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
