@@ -1,7 +1,7 @@
 
 
 
-# 🔗 Advanced URL Shortener Backend
+# Advanced URL Shortener Backend
 
 Welcome to the backend repository for the **Advanced URL Shortener** project!
 This API offers robust URL shortening capabilities, including user authentication, detailed analytics, and essential security features like rate limiting and caching. The goal is to deliver a scalable, efficient service that simplifies URL sharing while offering valuable insights into link performance.
