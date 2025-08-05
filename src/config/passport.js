@@ -1,5 +1,5 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const User = require('../models/User');
+const User = require('../models/User'); // Assuming User model path is correct
 
 module.exports = function (passport) {
     passport.use(
@@ -7,9 +7,8 @@ module.exports = function (passport) {
             {
                 clientID: process.env.GOOGLE_CLIENT_ID,
                 clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-                callbackURL: '/api/auth/google/callback',
+                callbackURL: process.env.GOOGLE_CALLBACK_URL, // Uses environment variable
             },
-           
             async (accessToken, refreshToken, params, profile, done) => {
                 const newUser = {
                     googleId: profile.id,
