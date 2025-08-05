@@ -22,7 +22,7 @@ const app = express();
 app.set('trust proxy', true);
 
 app.use(cors({
-    origin: '*', // Allows requests from any origin for backend-only testing
+    origin: '*', 
     credentials: true
 }));
 
@@ -44,12 +44,12 @@ require('./src/config/passport')(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Define base URL for backend based on environment
+
 const BASE_BACKEND_URL = process.env.NODE_ENV === 'production'
-    ? 'https://advanced-url-shortener-app-gpx2.onrender.com' // Replace with your actual deployed backend URL
+    ? 'https://advanced-url-shortener-app-gpx2.onrender.com'
     : 'http://localhost:5000';
 
-// Swagger JSDoc options
+
 const swaggerOptions = {
   swaggerDefinition: {
     openapi: '3.0.0',
@@ -60,7 +60,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: `${BASE_BACKEND_URL}/api`, // UPDATED: Dynamic server URL for Swagger
+        url: `${BASE_BACKEND_URL}/api`, 
         description: process.env.NODE_ENV === 'production' ? 'Deployed backend server' : 'Local development server',
       },
     ],
@@ -70,7 +70,7 @@ const swaggerOptions = {
           type: 'oauth2',
           flows: {
             implicit: {
-              authorizationUrl: `${BASE_BACKEND_URL}/api/auth/google`, // UPDATED: Dynamic authorization URL
+              authorizationUrl: `${BASE_BACKEND_URL}/api/auth/google`, 
               scopes: {
                 profile: 'Grants access to a user\'s basic profile information.',
               },
@@ -83,7 +83,7 @@ const swaggerOptions = {
       GoogleOAuth: ['profile'],
     }],
   },
-  apis: ['./src/routes/*.js'], // Path to the API docs
+  apis: ['./src/routes/*.js'], 
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
@@ -98,7 +98,7 @@ app.use('/', redirectRoutes);
 
 app.get('/', (req, res) => {
   if (req.isAuthenticated()) {
-    res.redirect('/dashboard'); // Redirect to the backend's own /dashboard route
+    res.redirect('/dashboard'); 
   } else {
     res.redirect('/api/auth/google');
   }
